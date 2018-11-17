@@ -1490,6 +1490,8 @@ filter_symbols (bfd *abfd, bfd *obfd, asymbol **osyms,
 
       undefined = bfd_is_und_section (bfd_get_section (sym));
 
+      char *prefix_symbols_string_local = (strstr(name, "2v8") != NULL) ? prefix_symbols_string : NULL;
+
       if (add_sym_list)
 	{
 	  struct addsym_node *ptr;
@@ -1527,7 +1529,7 @@ filter_symbols (bfd *abfd, bfd *obfd, asymbol **osyms,
 	    || (name[0] == bfd_get_symbol_leading_char (abfd)));
 
       /* Short circuit for change_leading_char if we can do it in-place.  */
-      if (rem_leading_char && add_leading_char && !prefix_symbols_string)
+      if (rem_leading_char && add_leading_char && !prefix_symbols_string_local)
 	{
 	  name[0] = bfd_get_symbol_leading_char (obfd);
 	  bfd_asymbol_name (sym) = name;
@@ -1540,19 +1542,19 @@ filter_symbols (bfd *abfd, bfd *obfd, asymbol **osyms,
 	bfd_asymbol_name (sym) = ++name;
 
       /* Add new leading char and/or prefix.  */
-      if (add_leading_char || prefix_symbols_string)
+      if (add_leading_char || prefix_symbols_string_local)
 	{
 	  char *n, *ptr;
 
-	  ptr = n = (char *) xmalloc (1 + strlen (prefix_symbols_string)
+	  ptr = n = (char *) xmalloc (1 + strlen (prefix_symbols_string_local)
 				      + strlen (name) + 1);
 	  if (add_leading_char)
 	    *ptr++ = bfd_get_symbol_leading_char (obfd);
 
-	  if (prefix_symbols_string)
+	  if (prefix_symbols_string_local)
 	    {
-	      strcpy (ptr, prefix_symbols_string);
-	      ptr += strlen (prefix_symbols_string);
+	      strcpy (ptr, prefix_symbols_string_local);
+	      ptr += strlen (prefix_symbols_string_local);
 	    }
 
 	  strcpy (ptr, name);
